@@ -1,0 +1,10 @@
+#!/usr/bin/env ruby
+
+filename = ARGV.first
+abort("Error! Need a basic file") if filename.nil?
+
+%x( rm -f #{filename}.phc )
+%x( ./txt2bas #{filename}.bas #{filename}.phc )
+abort("Error! K7 not created") unless File.exist?("#{filename}.phc")
+
+%x( mv -f #{filename}.phc '/home/xavier/.wine/drive_c/Program Files (x86)/phc25/' )
