@@ -142,7 +142,7 @@
 4830 print "======="
 4840 print:print "Xavier Nayrac 2025":print
 4850 print "Portage et adaptation du jeu"
-4860 print "Blitz du magazine <<MO5 jeux"
+4860 print "Blitz du livre <<MO5 jeux"
 4870 print "d'action>> de 1984."
 4900 r$=inkey$
 4910 if r$="" then 4900
