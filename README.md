@@ -6,6 +6,7 @@ the help of `wine`.
 ## Games
 
 - basic/blitz.bas : Blitz game in text mode, from the 1984 magazine «MO5 jeux d'action».
+- basic/blitz2.bas : same as above but in semi-graphic mode.
 
 ## Tools
 
