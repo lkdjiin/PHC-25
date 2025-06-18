@@ -11,3 +11,7 @@ the help of `wine`.
 ## Tools
 
 - k7: ruby script to build a `*.phc` from a `*.bas` and put it in `wine`.
+
+## Notes
+
+- notes.md: misc notes in french
