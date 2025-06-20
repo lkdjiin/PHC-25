@@ -13,10 +13,6 @@ org $f000
 game:
   ld hl, VRAM+1
 
-  ; ld b, 0 ; for y=0 to 15 excluded
-; game_for_y:
-  ; ld c, 0 ; for x=0 to 32 excluded
-; game_for_x:
 game_while:
   ; Update the plane every other turn to make it two times slower than the
   ; bomb.
@@ -43,9 +39,10 @@ game_update_plane:
   ; Check if there is a collision with a building
   inc hl ; Now hl points in front of the plane
   ld a, (hl)
+  ; TODO replace the two following lines with AND A
   ld b, 0 ; Zero means no building
   cp b
-  jr nz, return_to_basic
+  jr nz, plane_fall
   dec hl
 game_update_bomb:
   call bomb ; must preserve HL
@@ -63,6 +60,38 @@ game_update_bomb:
   cp b
   jr nz, game_while
 return_to_basic:
+  ret
+
+; ----------------------------------------------------------------------
+; Game over, the plane until the bottom of the screen.
+; hl: VRAM position in front of the plane.
+; Destroy all.
+plane_fall:
+  ld de, 31 ; A full line of characters, minus one.
+  dec hl
+plane_fall_next:
+  dec hl ; Now position at the left part of the plane.
+  call pause
+  call pause
+  call pause
+  call pause
+  ; Erase plane at old position.
+  ld (hl), 0
+  inc hl
+  ld (hl), 0
+  add hl, de
+  ; If hl>=$6200 it means that the plane is outside of the screen.
+  ; A quick way to check this is to simply compare bp high byte with $62.
+  ld a, $62
+  cp h
+  jr z, return_to_basic
+  ; Draw plane
+  call pause
+  ld (hl), 173 ; draw
+  inc hl ; To draw the new right part.
+  call pause
+  ld (hl), 174 ; draw
+  jp plane_fall_next
   ret
 
 ; ----------------------------------------------------------------------
