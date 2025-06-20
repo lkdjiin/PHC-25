@@ -11,6 +11,7 @@ the help of `wine`.
 ## Tools
 
 - k7: ruby script to build a `*.phc` from a `*.bas` and put it in `wine`.
+- asm2data: ruby script to «compile» a `*.asm` file into ready to insert basic lines.
 
 ## Notes
 

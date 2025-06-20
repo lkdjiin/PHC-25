@@ -1,0 +1,21 @@
+#!/usr/bin/env ruby
+
+asm_file = ARGV.first
+abort("Error! Need an assembly file") if asm_file.nil?
+
+# Assembly
+%x( rm -f a.bin )
+%x( z80asm #{asm_file} )
+abort("Error! No a.bin file found") unless File.exist?('a.bin')
+
+# To hexadecimal
+hexa = %x( xxd -c 1 -ps a.bin )
+hexa = hexa.split("\n")
+puts "#{hexa.size} hex values\n\n"
+
+# BASIC data lines
+line_num = 9000
+hexa.each_slice(20).to_a.each do |values|
+  puts "#{line_num} data #{values.join(',')}"
+  line_num += 1
+end
