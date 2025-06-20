@@ -7,6 +7,7 @@ the help of `wine`.
 
 - basic/blitz.bas : Blitz game in text mode, from the 1984 magazine «MO5 jeux d'action».
 - basic/blitz2.bas : same as above but in semi-graphic mode.
+- asm/blitz.asm + asm/blitz_loader.bas : _[Work In Progress]_ Assembly version of Blitz.
 
 ## Tools
 
