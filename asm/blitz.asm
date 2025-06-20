@@ -3,8 +3,15 @@ SPACE_KEY: equ 127
 
 org $f000
 
+start:
   call build_town
   call game
+  ; if hl still holds $61xx it means the game was won.
+  ld a, h
+  ld b, $61
+  cp b
+  jr z, start ; next town
+  ; Or game over!
   ret
 
 ; ----------------------------------------------------------------------
@@ -29,19 +36,17 @@ game_update_plane:
   ; Draw plane
   dec hl ; hl points to the left char of the plane.
   call pause
+  call pause
+  call pause
   ld (hl), 0 ; erase
   inc hl ; To draw the new left part.
-  call pause
   ld (hl), 173 ; draw
   inc hl ; To draw the new right part.
-  call pause
   ld (hl), 174 ; draw
   ; Check if there is a collision with a building
   inc hl ; Now hl points in front of the plane
-  ld a, (hl)
-  ; TODO replace the two following lines with AND A
-  ld b, 0 ; Zero means no building
-  cp b
+  ld a, (hl) ; Zero means no building
+  and a
   jr nz, plane_fall
   dec hl
 game_update_bomb:
@@ -59,7 +64,7 @@ game_update_bomb:
   ld b, $f0
   cp b
   jr nz, game_while
-return_to_basic:
+win_or_fail:
   ret
 
 ; ----------------------------------------------------------------------
@@ -84,7 +89,7 @@ plane_fall_next:
   ; A quick way to check this is to simply compare bp high byte with $62.
   ld a, $62
   cp h
-  jr z, return_to_basic
+  jr z, win_or_fail
   ; Draw plane
   call pause
   ld (hl), 173 ; draw
