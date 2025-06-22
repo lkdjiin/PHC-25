@@ -1,7 +1,9 @@
 VRAM: equ $6000
 SPACE_KEY: equ 127
+LEVEL: equ $f000 ; 1 easy - 2 normal - 3 hard
+SCORE: equ $f002
 
-org $f000
+org $f00a ; Ten bytes for variables sharing with basic.
 
 start:
   call build_town
@@ -18,14 +20,15 @@ start:
 ; Start the game. Update plane.
 ; Destroy all.
 game:
+  ld hl, 0
+  ld (SCORE), hl
   ld hl, VRAM+1
-
 game_while:
   ; Update the plane every other turn to make it two times slower than the
   ; bomb.
   ld a, (yes_or_no)
   cpl a
-  ld (yes_or_no), a 
+  ld (yes_or_no), a
   and a
   jr z, game_update_plane
   jr game_update_bomb
@@ -35,9 +38,15 @@ game_update_plane:
   ; hl currently holds the position of the "right char" of the plane.
   ; Draw plane
   dec hl ; hl points to the left char of the plane.
+  
+  ld a, (LEVEL)
+  ld d, 3
+  cp d
+  jr z, fast_fast 
   call pause
   call pause
   call pause
+fast_fast:
   ld (hl), 0 ; erase
   inc hl ; To draw the new left part.
   ld (hl), 173 ; draw
@@ -64,6 +73,13 @@ game_update_bomb:
   ld b, $f0
   cp b
   jr nz, game_while
+  ; Add 512 to the score.
+  push hl
+  ld hl, (SCORE)
+  ld de, 512
+  add hl, de
+  ld (SCORE), hl
+  pop hl
 win_or_fail:
   ret
 
@@ -72,6 +88,16 @@ win_or_fail:
 ; hl: VRAM position in front of the plane.
 ; Destroy all.
 plane_fall:
+  ; Add hl-VRAM to the score.
+  push hl ; save plane position
+  ld de, VRAM
+  or a
+  sbc hl, de ; get score for current town
+  ld de, (SCORE)
+  add hl, de ; updated score
+  ld (SCORE), hl
+  pop hl ; get back plane's position
+
   ld de, 31 ; A full line of characters, minus one.
   dec hl
 plane_fall_next:
@@ -180,7 +206,31 @@ display_bomb_end:
 ; Build the town.
 ; Destroy all.
 build_town:
-  ld b, 7 ; for x=5 to 25 excluded
+  ; level 1: b 10 to 22 excluded
+  ; level 2:b 5 to 27 excluded
+  ; level 3: b 2 to 30 excluded
+  ld a, (LEVEL)
+  ld d, 1
+  cp d
+  jr nz, maybe_level_2
+  ; It's level 1
+  ld b, 10 ; for x=10 to 22
+  ld a, 22
+  ld (x_right), a
+  jr town_for_x
+maybe_level_2:
+  ld d, 2
+  cp d
+  jr nz, level_3 ; It has to be level 3.
+  ; It's level 2
+  ld b, 5 ; for x=5 to 27
+  ld a, 27
+  ld (x_right), a
+  jr town_for_x
+level_3:
+  ld b, 2 ; for x=2 to 30
+  ld a, 30
+  ld (x_right), a
 town_for_x:
   call pause
   call rnd_height
@@ -213,7 +263,7 @@ town_for_y:
   jr nz, town_for_y
 
   inc b
-  ld a, 25
+  ld a, (x_right)
   cp b
   jr nz, town_for_x
   ret
@@ -286,3 +336,5 @@ bbp: ; bomb base position
   dw 0
 b1: ; old bomb position
   dw 0
+x_right:
+  db 0
