@@ -1,10 +1,15 @@
 10 clear 100,&hf000
 20 cls
 30 gosub 1000:rem init
-100 print "Chargement..."
+100 print "Chargement...":gosub 5200
 110 for k=1 to 921
-120 read a$
-130 poke &hf00a+(k-1),val("&h"+a$)
+115 read a$
+120 poke &hf00a+(k-1),val("&h"+a$)
+123 if k=150 then print "...":gosub 5300
+125 if k=300 then print "Encore un peu de patience...":gosub 5400
+126 if k=450 then print "...":gosub 5300
+127 if k=600 then print "Ce sera plus trop long...":gosub 5400
+128 if k=750 then print "...":gosub 5300
 140 next k
 200 gosub 4000:rem welcome
 210 screen 2,1,1
@@ -101,6 +106,12 @@
 5210 play "t115s10m2000"
 5220 play "o4l8d+fg+a+l4gd+l1d","o2l8d+r8d+r8d+r8d+r8gr8gr8gr8gr8"
 5230 return
+5300 rem --- phrase 2
+5310 play "o4l8d+fg+a+"
+5320 return
+5400 rem --- phrase 3
+5410 play "o4l8d+fg+g+"
+5420 return
 9000 data ed,5f,21,99,f1,77,21,9b,f2,77,cd,1b,f1,cd,21,f0,7c,06,61,b8
 9001 data 28,f4,c9,21,00,00,22,02,f0,21,01,60,3a,36,f0,2f,32,36,f0,a7
 9002 data 28,03,18,21,00,2b,3a,00,f0,16,03,ba,28,09,cd,96,f1,cd,96,f1
