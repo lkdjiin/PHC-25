@@ -5,6 +5,13 @@ SCORE: equ $f002
 
 org $f00a ; Ten bytes for variables sharing with basic.
 
+; Initialize pseudo random indexes
+  ld a, r
+  ld hl, height_index
+  ld (hl), a
+  ld hl, shape_index
+  ld (hl), a
+
 start:
   call build_town
   call game
