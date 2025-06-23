@@ -2,6 +2,8 @@ VRAM: equ $6000
 SPACE_KEY: equ 127
 LEVEL: equ $f000 ; 1 easy - 2 normal - 3 hard
 SCORE: equ $f002
+S_REG: equ $c1 ; sound
+S_VAL: equ $c0 ; sound
 
 org $f00a ; Ten bytes for variables sharing with basic.
 
@@ -11,6 +13,16 @@ org $f00a ; Ten bytes for variables sharing with basic.
   ld (hl), a
   ld hl, shape_index
   ld (hl), a
+
+; Initialize white noise
+  ld a, 6
+  out (S_REG), a
+  ld a, 30
+  out (S_VAL), a
+  ld a, 7
+  out (S_REG), a
+  ld a, 28
+  out (S_VAL), a
 
 start:
   call build_town
@@ -188,7 +200,27 @@ display_bomb:
   ; if bomb is outside the screen then reset its position
   ld hl, 0
   ld (bp), hl
+  ; and stop white noise
+  ld a, 10
+  out (S_REG), a
+  ld a, 0
+  out (S_VAL), a
 display_bomb_1:
+  ; If bomb is beyond line 13, white noise
+  ; so if bp>= $61c0
+  ld hl, (bp)
+  ld a, $61
+  cp h
+  jr nz, display_bomb_2
+  ld a, $bf
+  cp l
+  jp m, display_bomb_2
+  ; go white noise
+  ld a, 10
+  out (S_REG), a
+  ld a, 10
+  out (S_VAL), a
+display_bomb_2:
   ; delete old bomb at b1
   ld hl, (b1)
   ld (hl), 0
